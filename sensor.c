@@ -1,7 +1,9 @@
+// Importa as bibliotecas
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdint.h>
 
+// Função para regular a taxa de amostragem do conversor A/D
 int ADCsingleREAD(uint8_t adctouse){
 
     int ADCval;
@@ -10,8 +12,8 @@ int ADCsingleREAD(uint8_t adctouse){
     ADMUX |= (1 << REFS0);   // Usa AVcc como referência
     ADMUX &= ~(1 << ADLAR);  // Limpa para a resolução de 10 bits
     
-    ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // 128 prescaler para 8Mhz
-    ADCSRA |= (1 << ADEN);    // Habilita o ADC
+    ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // 128 prescalonador para 8Mhz
+    ADCSRA |= (1 << ADEN);    // Ativa o ADC
     ADCSRA |= (1 << ADSC);    // Começa a conversão do ADC
     
     while(ADCSRA & (1 << ADSC)); // Espera o ADC terminar
@@ -22,8 +24,8 @@ int ADCsingleREAD(uint8_t adctouse){
     return ADCval;
 }
 
-int Sinal;
-float Lux;
+int Sinal; // Leitura do sinal em uma escala de 1024 bits
+float Lux; // Luminosidade em uma escala de 0 a 1000 Lux
 
 int main (void){
 
