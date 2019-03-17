@@ -29,7 +29,7 @@ while True:
         with open('tabela.csv', mode = 'w', newline = '') as tabela:
             while True:
                 linha = arduino.readline().decode('utf-8').strip('\r\n')
-                tempo = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S.%f')
+                tempo = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S.%f')
                 arquivo = csv.writer(tabela, delimiter = ",")
                 arquivo.writerow([tempo, linha])
     except:
