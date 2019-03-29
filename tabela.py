@@ -1,12 +1,11 @@
 # Importa as bibliotecas
-import serial, time, datetime, csv
+import serial, time, csv
 
 # Valor lógico que representa a conexão do arduino
-connectado = False
+conectado = False
 
 # Estabelece a conexão a porta serial do arduino
-portas = ['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3','COM1', 
-'COM2', 'COM3', 'COM4','COM5', 'COM6','COM7', 'COM8', 'COM9','COM10','COM11']
+portas = ['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3','COM1', 'COM2', 'COM3', 'COM4','COM5', 'COM6','COM7', 'COM8', 'COM9','COM10','COM11']
 
 for dispositivo in portas:
     try:
@@ -17,19 +16,22 @@ for dispositivo in portas:
         print("Conexão falhou com: %s \n" %(dispositivo))
 
 # Laço até estabelecer a conexão com o arduino
-while not connectado:
+while not conectado:
     porta = arduino.read()
     arduino.flushInput()
-    connectado = True
+    conectado = True
     print("Conectado a porta: %s \n" %(arduino.portstr))
+
+# Tempo inicial de referência
+tzero = int(round(time.time() * 1000))
 
 # Decodifica a saída serial do arduino e salva no arquivo csv
 while True:
     try:   
-        with open('tabela.csv', mode = 'w', newline = '') as tabela:
+        with open('dados.csv', mode = 'w', newline = '') as tabela:
             while True:
                 linha = arduino.readline().decode('utf-8').strip('\r\n')
-                tempo = datetime.datetime.fromtimestamp(time.time()).strftime('%H:%M:%S.%f')
+                tempo = int(round(time.time() * 1000)) - tzero
                 arquivo = csv.writer(tabela, delimiter = ",")
                 arquivo.writerow([tempo, linha])
     except:
