@@ -29,7 +29,7 @@ float Lux; // Luminosidade em uma escala de 0 a 1000 Lux
 
 int main (void){
 
-    Serial.begin(9600); // Velocidade padrão da comunição serial
+    Serial.begin(115200); // Velocidade da comunição serial
 
     while (1){
 

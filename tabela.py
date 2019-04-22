@@ -5,12 +5,12 @@ import serial, time, csv
 conectado = False
 
 # Estabelece a conexão a porta serial do arduino
-portas = ['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3','COM1', 'COM2', 'COM3', 'COM4','COM5', 'COM6','COM7', 'COM8', 'COM9','COM10','COM11']
+portas = ['/dev/ttyACM0','/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3','COM1', 'COM2', 'COM3', 'COM4','COM5', 'COM6','COM7', 'COM8', 'COM9','COM10','COM11']
 
 for dispositivo in portas:
     try:
         print("\nConectando... %s" %(dispositivo))
-        arduino = serial.Serial(port = dispositivo, baudrate = 9600, timeout = 1)
+        arduino = serial.Serial(port = dispositivo, baudrate = 115200, timeout = 1)
         break
     except:
         print("Conexão falhou com: %s \n" %(dispositivo))
