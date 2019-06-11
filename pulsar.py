@@ -1,7 +1,20 @@
+#!~/anaconda3/bin/python
+# -*- coding: utf-8 -*-
+
 # Importa as bibliotecas
+# Generic/Built-in
 import serial, time, csv, sys
 import matplotlib.pyplot as plt
 import pandas as pd
+
+__author__ = 'Yohan Alexander'
+__copyright__ = 'Copyright 2019, Pulsar Project' 
+__credits__ = ['Yohan Alexander']
+__license__ = 'MPL 2.0'
+__version__ = '0.1.0'
+__maintainer__ = 'Yohan Alexander'
+__email__ = 'yohanfranca@gmail.com'
+__status__ = 'Dev'
 
 # Estilo de plotagem do gráfico
 plt.style.use('fivethirtyeight')
@@ -11,7 +24,7 @@ def main(args):
     # Valor lógico que representa a conexão do arduino
     conectado = False
 
-    # Estabelece a conexão a porta serial do arduino
+    # Caminho da porta serial do arduino
     porta = list()
     porta.append(args[1])
 
@@ -22,6 +35,7 @@ def main(args):
     # Nome do arquivo de saída
     dados = args[3]
 
+     # Estabelece a conexão com a porta serial do arduino
     for dispositivo in porta:
         try:
             print("\nConectando... %s" %(dispositivo))
@@ -59,14 +73,17 @@ def main(args):
     tabela.close()
     arduino.close()
 
-    # Plota os dados obtidos no gráfico e salva a imagem
+    # Plota os dados obtidos no gráfico e salva a imagem obtida
     df = pd.read_csv('%s.csv' %dados, delimiter=',')
     df.columns=['Tempo', 'Luminosidade']
     df[50:500].plot.line(x='Tempo', y='Luminosidade', figsize=(20,10))
+    
+    # Formata a saída do gráfico e a legenda da imagem
     plt.title('%s' %dados)
     plt.xlabel('Tempo (milisegundos)')
     plt.ylabel('Luminosidade (lux)')
     plt.savefig('%s.png' %dados, bbox_inches='tight')
+
     print("Imagem salva em %s.png\n" %dados)
     
 if __name__ == "__main__":
