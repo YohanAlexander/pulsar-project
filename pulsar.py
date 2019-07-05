@@ -3,9 +3,10 @@
 
 # Importa as bibliotecas
 # Generic/Built-in
-import serial, time, csv, sys
+import serial, time, csv, sys, os
 import matplotlib.pyplot as plt
 import pandas as pd
+import serial.tools.list_ports
 
 __author__ = 'Yohan Alexander'
 __copyright__ = 'Copyright 2019, Pulsar Project' 
@@ -21,35 +22,64 @@ plt.style.use('fivethirtyeight')
 
 def main(args):
 
+    print("\n###########################\n\nSimulated Pulsar LightCurve\n\n###########################\n")
+
     # Valor lógico que representa a conexão do arduino
     conectado = False
 
-    # Caminho da porta serial do arduino
-    porta = list()
-    porta.append(args[1])
+    # Valor de referência para contagem do tempo de exposição
+    timeout = 0    
 
     # Tempo de exposição para captura dos dados
-    expo = int(args[2]) * 100
-    timeout = 0
-
-    # Nome do arquivo de saída
-    dados = args[3]
-
-     # Estabelece a conexão com a porta serial do arduino
-    for dispositivo in porta:
+    while(True):
         try:
-            print("\nConectando... %s" %(dispositivo))
-            arduino = serial.Serial(port = dispositivo, baudrate = 115200, timeout = 1)
+            expo = int(input(">>> Tempo para captura dos dados em segundos: \n")) * 100
+            if type(expo) != int:
+                raise Exception
             break
         except:
-            print("Conexão falhou com: %s \n" %(dispositivo))
-
-    # Laço até estabelecer a conexão com o arduino
-    while not conectado:
+            print(">>> Valor Inválido\n")
+            continue
+    
+    #Nome do arquivo de saída
+    while(True):
+        try:
+            dados = input(">>> Nome do arquivo de saída: \n")
+            if len(dados) == 0:
+                raise Exception
+            break
+        except:
+            print(">>> Valor Inválido\n")
+            continue
+    
+    # Caminho da porta serial do arduino
+    print('>>> Procurando dispositivos...\n')
+    porta = list(serial.tools.list_ports.comports(include_links=False))
+    
+    # Estabelece a conexão com a porta serial do arduino    
+    if(len(porta) != 0):
+        for dispositivo in porta:
+            try:
+                print(">>> Conectando... %s\n" %(dispositivo.device))
+                arduino = serial.Serial(port = dispositivo, baudrate = 115200, timeout = 1)
+                if arduino.isOpen():
+                    conectado = True
+                break
+            except:
+                print(">>> Conexão falhou com: %s\n" %(dispositivo.device))
+    else:
+        print(">>> Nenhum dispositivo encontrado\n")
+    
+    # Condição até estabelecer a conexão com o arduino
+    if conectado == True:
         porta = arduino.read()
         arduino.flushInput()
-        conectado = True
-        print("Conectado a porta: %s \n" %(arduino.portstr))
+        arduino.flushOutput()
+        print(">>> Conectado a porta: %s\n" %(arduino.portstr))
+    
+    else:
+        print(">>> Verifique a conexão e reinicie o programa\n")
+        quit(main)
     
     # Tempo inicial de referência
     tzero = int(round(time.time() * 1000))
@@ -58,16 +88,16 @@ def main(args):
     while timeout < expo:
         try:
             with open('%s.csv' %dados, mode = 'w', newline = '') as tabela:
-                print("Capturando dados...")
+                print(">>> Capturando dados...\n")
                 while timeout < expo:
                     linha = arduino.readline().decode('utf-8').strip('\r\n')
                     tempo = int(round(time.time() * 1000)) - tzero
                     arquivo = csv.writer(tabela, delimiter = ",")
                     arquivo.writerow([tempo, linha])
                     timeout += 1
-                print("Dados obtidos com sucesso\n")
+                print(">>> Dados obtidos com sucesso\n")
         except:
-            print("Conexão Interrompida\n")
+            print(">>> Conexão Interrompida\n")
             break
 
     tabela.close()
@@ -84,7 +114,7 @@ def main(args):
     plt.ylabel('Luminosidade (lux)')
     plt.savefig('%s.png' %dados, bbox_inches='tight')
 
-    print("Imagem salva em %s.png\n" %dados)
+    print(">>> Imagem salva em %s.png\n" %dados)
     
 if __name__ == "__main__":
     main(sys.argv)
