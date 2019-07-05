@@ -34,8 +34,6 @@ def main(args):
     while(True):
         try:
             expo = int(input(">>> Tempo para captura dos dados em segundos: \n")) * 100
-            if type(expo) != int:
-                raise Exception
             break
         except:
             print(">>> Valor Inválido\n")
@@ -57,11 +55,11 @@ def main(args):
     porta = list(serial.tools.list_ports.comports(include_links=False))
     
     # Estabelece a conexão com a porta serial do arduino    
-    if(len(porta) != 0):
+    if(len(porta) > 0):
         for dispositivo in porta:
             try:
                 print(">>> Conectando... %s\n" %(dispositivo.device))
-                arduino = serial.Serial(port = dispositivo, baudrate = 115200, timeout = 1)
+                arduino = serial.Serial(port = dispositivo.device, baudrate = 115200, timeout = 1)
                 if arduino.isOpen():
                     conectado = True
                 break
@@ -76,10 +74,9 @@ def main(args):
         arduino.flushInput()
         arduino.flushOutput()
         print(">>> Conectado a porta: %s\n" %(arduino.portstr))
-    
     else:
         print(">>> Verifique a conexão e reinicie o programa\n")
-        quit(main)
+        quit(main(args[0]))
     
     # Tempo inicial de referência
     tzero = int(round(time.time() * 1000))
@@ -98,23 +95,27 @@ def main(args):
                 print(">>> Dados obtidos com sucesso\n")
         except:
             print(">>> Conexão Interrompida\n")
-            break
+            quit(main(args[0]))
 
     tabela.close()
     arduino.close()
 
-    # Plota os dados obtidos no gráfico e salva a imagem obtida
-    df = pd.read_csv('%s.csv' %dados, delimiter=',')
-    df.columns=['Tempo', 'Luminosidade']
-    df[50:500].plot.line(x='Tempo', y='Luminosidade', figsize=(20,10))
-    
-    # Formata a saída do gráfico e a legenda da imagem
-    plt.title('%s' %dados)
-    plt.xlabel('Tempo (milisegundos)')
-    plt.ylabel('Luminosidade (lux)')
-    plt.savefig('%s.png' %dados, bbox_inches='tight')
+    try:
+        # Plota os dados obtidos no gráfico e salva a imagem obtida
+        df = pd.read_csv('%s.csv' %dados, delimiter=',')
+        df.columns=['Tempo', 'Luminosidade']
+        df[50:500].plot.line(x='Tempo', y='Luminosidade', figsize=(20,10))
 
-    print(">>> Imagem salva em %s.png\n" %dados)
+        # Formata a saída do gráfico e a legenda da imagem
+        plt.title('%s' %dados)
+        plt.xlabel('Tempo (milisegundos)')
+        plt.ylabel('Luminosidade (lux)')
+        plt.savefig('%s.png' %dados, bbox_inches='tight')
+
+        print(">>> Imagem salva em %s.png\n" %dados)
+    except:
+        print(">>> Erro ao gerar a imagem\n")
+        quit(main(args[0]))
     
 if __name__ == "__main__":
     main(sys.argv)
