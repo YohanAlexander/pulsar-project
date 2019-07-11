@@ -17,9 +17,6 @@ __maintainer__ = 'Yohan Alexander'
 __email__ = 'yohanfranca@gmail.com'
 __status__ = 'Dev'
 
-# Estilo de plotagem do gráfico
-plt.style.use('fivethirtyeight')
-
 def main(args):
 
     print("\n###########################\n\nSimulated Pulsar LightCurve\n\n###########################\n")
@@ -44,6 +41,17 @@ def main(args):
         try:
             dados = input(">>> Nome do arquivo de saída: \n")
             if len(dados) == 0:
+                raise Exception
+            break
+        except:
+            print(">>> Valor Inválido\n")
+            continue
+        
+    #Título do gráfico de saída
+    while(True):
+        try:
+            title = input(">>> Título que será exibido no gráfico: \n")
+            if len(title) == 0:
                 raise Exception
             break
         except:
@@ -104,15 +112,16 @@ def main(args):
         # Plota os dados obtidos no gráfico e salva a imagem obtida
         df = pd.read_csv('%s.csv' %dados, delimiter=',')
         df.columns=['Tempo', 'Luminosidade']
-        df[50:500].plot.line(x='Tempo', y='Luminosidade', figsize=(20,10))
+        df[:500].plot.line(x='Tempo', y='Luminosidade', figsize=(20,10))
 
         # Formata a saída do gráfico e a legenda da imagem
-        plt.title('%s' %dados)
+        plt.title('%s' %title)
         plt.xlabel('Tempo (milisegundos)')
         plt.ylabel('Luminosidade (lux)')
         plt.savefig('%s.png' %dados, bbox_inches='tight')
 
         print(">>> Imagem salva em %s.png\n" %dados)
+    
     except:
         print(">>> Erro ao gerar a imagem\n")
         quit(main(args[0]))
