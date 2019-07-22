@@ -2,12 +2,18 @@
 # -*- coding: utf-8 -*-
 
 # Importa as bibliotecas
+
 # Generic/Built-in
-import serial, time, csv, sys, os
+import time, csv, sys, os
+
+# Other Libs
+import serial
+import serial.tools.list_ports
 import matplotlib.pyplot as plt
 import pandas as pd
-import serial.tools.list_ports
+import tqdm
 
+# Wrapping Header
 __author__ = 'Yohan Alexander'
 __copyright__ = 'Copyright 2019, Pulsar Project' 
 __credits__ = ['Yohan Alexander']
@@ -31,12 +37,14 @@ def main(args):
     while(True):
         try:
             expo = int(input(">>> Tempo para captura dos dados em segundos: \n")) * 100
+            if type(expo) != int:
+                raise Exception
             break
         except:
             print(">>> Valor Inválido\n")
             continue
     
-    #Nome do arquivo de saída
+    # Nome do arquivo de saída
     while(True):
         try:
             dados = input(">>> Nome do arquivo de saída: \n")
@@ -47,11 +55,22 @@ def main(args):
             print(">>> Valor Inválido\n")
             continue
         
-    #Título do gráfico de saída
+    # Título do gráfico de saída
     while(True):
         try:
             title = input(">>> Título que será exibido no gráfico: \n")
             if len(title) == 0:
+                raise Exception
+            break
+        except:
+            print(">>> Valor Inválido\n")
+            continue
+
+    # Tamanho da fatia dos dados para plotar no gráfico
+    while(True):
+        try:
+            plot = int(input(">>> Fatia dos dados que será plotada no gráfico: \n"))
+            if type(plot) != int:
                 raise Exception
             break
         except:
@@ -94,7 +113,7 @@ def main(args):
         try:
             with open('%s.csv' %dados, mode = 'w', newline = '') as tabela:
                 print(">>> Capturando dados...\n")
-                while timeout < expo:
+                for i in tqdm(range(expo)):
                     linha = arduino.readline().decode('utf-8').strip('\r\n')
                     tempo = int(round(time.time() * 1000)) - tzero
                     arquivo = csv.writer(tabela, delimiter = ",")
@@ -112,7 +131,7 @@ def main(args):
         # Plota os dados obtidos no gráfico e salva a imagem obtida
         df = pd.read_csv('%s.csv' %dados, delimiter=',')
         df.columns=['Tempo', 'Luminosidade']
-        df[:500].plot.line(x='Tempo', y='Luminosidade', figsize=(20,10))
+        df[:plot].plot.line(x='Tempo', y='Luminosidade', figsize=(20,10))
 
         # Formata a saída do gráfico e a legenda da imagem
         plt.title('%s' %title)
@@ -121,7 +140,7 @@ def main(args):
         plt.savefig('%s.png' %dados, bbox_inches='tight')
 
         print(">>> Imagem salva em %s.png\n" %dados)
-    
+
     except:
         print(">>> Erro ao gerar a imagem\n")
         quit(main(args[0]))
