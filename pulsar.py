@@ -11,8 +11,8 @@ import serial
 import serial.tools.list_ports
 import matplotlib.pyplot as plt
 import pandas as pd
-import tqdm
 import click
+import tqdm
 
 # Wrapping Header
 __author__ = 'Yohan Alexander'

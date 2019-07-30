@@ -5,7 +5,7 @@
 import sys, subprocess
 
 # Other libs
-import click
+import click, xspec
 
 __author__ = 'Yohan Alexander'
 __copyright__ = 'Copyright 2019, Xspec Script' 

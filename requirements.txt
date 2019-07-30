@@ -1,4 +1,5 @@
 pyserial
 matplotlib
 pandas
+click
 tqdm
