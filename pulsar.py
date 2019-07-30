@@ -12,6 +12,7 @@ import serial.tools.list_ports
 import matplotlib.pyplot as plt
 import pandas as pd
 import tqdm
+import click
 
 # Wrapping Header
 __author__ = 'Yohan Alexander'
@@ -23,7 +24,11 @@ __maintainer__ = 'Yohan Alexander'
 __email__ = 'yohanfranca@gmail.com'
 __status__ = 'Dev'
 
-def main(args):
+@click.command()
+def main():
+    """
+    Python script to obtain and plot data from the simulated pulsar
+    """
 
     print("\n###########################\n\nSimulated Pulsar LightCurve\n\n###########################\n")
 
@@ -103,7 +108,7 @@ def main(args):
         print(">>> Conectado a porta: %s\n" %(arduino.portstr))
     else:
         print(">>> Verifique a conexão e reinicie o programa\n")
-        quit(main(args[0]))
+        quit()
     
     # Tempo inicial de referência
     tzero = int(round(time.time() * 1000))
@@ -122,7 +127,7 @@ def main(args):
                 print(">>> Dados obtidos com sucesso\n")
         except:
             print(">>> Conexão Interrompida\n")
-            quit(main(args[0]))
+            quit()
 
     tabela.close()
     arduino.close()
@@ -143,7 +148,7 @@ def main(args):
 
     except:
         print(">>> Erro ao gerar a imagem\n")
-        quit(main(args[0]))
+        quit()
     
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
